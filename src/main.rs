@@ -5,18 +5,20 @@ pub mod runst {
 		use rand::{thread_rng, Rng};
 				
 		//let mut m: [f64; 4] = [0.0; 4];
-		let m: Vec<f64> = vec![0.0; column];
+		let mut m: Vec<f64> = vec![0.0; column];
 		//let mut m = [0];
 		
 		let mut rng = thread_rng();
 
-		for mut i in m {		
+        //let mut count: i32 = &column;
+
+		for i in 0..= (column - 1) {		
 			let rand: f64 = rng.gen_range(0.0..=1.0);
-			i = rand;
+			m[i] = rand;
 			//println!("{:?}", i);
 		}
 		
-		&m
+		m
 	}
 }
 
