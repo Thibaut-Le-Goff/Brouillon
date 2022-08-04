@@ -4,12 +4,12 @@ pub mod runst {
 		use rand::{thread_rng, Rng};
 				
 		//let mut m: Vec<f64> = vec![0.0; column];
-		let mut matrix = vec![];//
+		let mut matrix: Vec<Vec<f64>> = vec![vec![0.0; row]; column];//
 		let mut rng = thread_rng();
 
 		for i in 0..= (column - 1) {	
-            		let add_row: Vec<f64> = vec![0.0; row];//
-            		matrix[i] = add_row;//
+            		//let add_row: Vec<f64> = vec![0.0; row];//
+            		//matrix[i] = add_row;//
             		for j in 0..= (row - 1) {//
 				let rand: f64 = rng.gen_range(0.0..=1.0);
 				//m[i] = rand;
