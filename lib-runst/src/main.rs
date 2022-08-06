@@ -10,7 +10,7 @@ pub mod runst {
 
 	    		for i in 0..= (row - 1) {	
                 		for j in 0..= (column - 1) {
-					let raand: f64 = rng.gen_range(a..=b);
+					let rand: f64 = rng.gen_range(a..=b);
         	    			matrix[i][j] = rand;
         			}
 		    	}
@@ -18,13 +18,13 @@ pub mod runst {
         	}
 		pub fn uniform_dis(column: usize, row: usize) -> Vec<Vec<f64>> {
 			use rand::{thread_rng, Rng};
-           		 //use std::num;
 				
 		    	let mut matrix: Vec<Vec<f64>> = vec![vec![0.0; column]; row];
 		    	let mut rng = thread_rng();
-            		let mut a: f64 = -1.0 / sqrt(column);
-            		let mut b: f64 = 1.0 / sqrt(column);
-
+            		let a: f64 = -1.0 / (column as f64).sqrt();
+            		let b: f64 = 1.0 / (column as f64).sqrt();
+			// .sqrt() works only with float
+	
 	    		for i in 0..= (row - 1) {	
             			for j in 0..= (column - 1) {
 				    let rand: f64 = rng.gen_range(a..=b);
