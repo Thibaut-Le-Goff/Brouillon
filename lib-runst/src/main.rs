@@ -1,4 +1,17 @@
 pub mod runst {
+	pub fn multiply(matrix: Vec<Vec<f64>>, vector: Vec<f64>) -> Vec<f64> {
+        let mut result: Vec<f64> = vec![0.0; matrix.len()];
+
+        for i in 0..= (matrix.len() - 1) { // row
+            let mut x: f64 = 0.0;
+            for j in 0..= (vector.len() - 1) { // column
+                x = (vector[j] * matrix[i][j]) + x;
+            }
+            result[i] = x;
+        }
+        return result;
+    }
+
 	pub mod weight_init {
 		pub fn normal_dis(column: usize, row: usize) -> Vec<Vec<f64>> {
 			use rand::{thread_rng, Rng};
@@ -24,6 +37,7 @@ pub mod runst {
 		    let mut rng = thread_rng();
             let a: f64 = -1.0 / (column as f64).sqrt();
             let b: f64 = 1.0 / (column as f64).sqrt();
+            // ;sqrt() only works with float
 
 	    	for i in 0..= (row - 1) {	
             	for j in 0..= (column - 1) {
@@ -108,7 +122,7 @@ fn main() {
 	let row: usize = 3; // nb neurones layer n
 	let column: usize = 2; // nb neurones layer n-1, fan_in
 
-	let test: Vec<Vec<f64>> = runst::weight_init::uniform_dis(column, row);
+	let test: Vec<Vec<f64>> = runst::weight_init::he_uniform_dis(column, row);
 
 	for i in 0..= (row - 1) {
         	println!("{:?}", test[i]);
@@ -120,33 +134,4 @@ fn main() {
 		}
 	}	
     
-    	println!("test de calcul :");
-
-    	println!(" + 1 :");
-	for i in 0..= (row - 1) {
-		for j in 0..= (column - 1)  {
-			println!("{}", (test[i][j] + 1.0));
-		}
-	}	
-
-    	println!(" - 1 :");
-	for i in 0..= (row - 1) {
-		for j in 0..= (column - 1)  {
-			println!("{}", (test[i][j] - 1.0));
-		}
-	}
-
-    	println!(" * 2 :");
-	for i in 0..= (row - 1) {
-		for j in 0..= (column - 1)  {
-			println!("{}", (test[i][j] * 2.0));
-		}
-	}
-
-    	println!(" / 2 :");
-	for i in 0..= (row - 1) {
-		for j in 0..= (column - 1)  {
-			println!("{}", (test[i][j] / 2.0));
-		}
-	}	
 }
