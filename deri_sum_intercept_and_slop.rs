@@ -11,11 +11,13 @@ fn main() {
     let try_number: usize = 50;
     // nombre d'essayes
     //let precision_success: f64 = 0.001;
-    // valeur dont sera multiplier les sum_square_residual 
+    // valeur dont sera divisé les sum_square_residual 
     // aux itération N-1 et N pour les comparer, les deux
     // résulatats sont arrondies à la valeur inférieur 
     // pour une comparaison qui puisse dire que les 
     // deux résultats sont les mêmes
+    // ex : 0.00977 et 0.00955
+    // = 9 et 9 => la bonne valeur a était trouvé
 
     let mut step_size: f64; // minimum doit être 0.001
     // taille des pas dans le rapprochement de 
