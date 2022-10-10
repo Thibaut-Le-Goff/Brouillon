@@ -8,18 +8,22 @@ fn main() {
     const WEIGHT: [f64; 3] = [0.5, 2.3, 2.9];
     // leur poids
 
-    let try_number: usize = 50;
+    let try_number: usize = 1000;
     // nombre d'essayes
-    //let precision_success: f64 = 0.001;
-    // valeur dont sera divisé les sum_square_residual 
-    // aux itération N-1 et N pour les comparer, les deux
-    // résulatats sont arrondies à la valeur inférieur 
-    // pour une comparaison qui puisse dire que les 
-    // deux résultats sont les mêmes
-    // ex : 0.00977 et 0.00955
-    // = 9 et 9 => la bonne valeur a était trouvé
 
-    let mut step_size: f64; // minimum doit être 0.001
+    //let step_size_stop: f64 = 0.001;
+    let mut slop_finale_trouve: bool = false;
+    let mut intercept_finale_trouve: bool = false;
+    // indication si les valeurs attendue ont 
+    // était trouvées
+    
+    let precision_success: f64 = 0.001;
+    // le programme s'arêtera lorsque que la somme
+    // des dérivées du carré de la différence entre les 
+    // données observées et prévues est entre cette 
+    // valeur et sont négatif
+
+    let mut step_size: f64;
     // taille des pas dans le rapprochement de 
     // sum_derivative_square_residual
     let learning_rate_slope: f64 = 0.01;
@@ -30,20 +34,12 @@ fn main() {
     // size pour l'intercept de la courbe des prédictions
 
     //let mut previous_sum_derivative_square_residual_slope: f64;
-    let mut sum_derivative_square_residual_slope: f64 = 0.0;
-    let mut derivative_square_residual_slope: f64;
+    let mut sum_derivative_square_residual: f64;
+    let mut derivative_square_residual: f64;
     // la somme des dérivés du carré de la différence 
     // entre la valeur observé et celle attendue
     // pour le calcule du coéficient directeur de la
     // courbes des prédictions a N-1 et N
-
-    //let mut previous_sum_derivative_square_residual_intercept: f64;
-    let mut sum_derivative_square_residual_intercept: f64 = 0.0;
-    let mut derivative_square_residual_intercept: f64;
-    // la somme des dérivés du carré de la différence 
-    // entre la valeur observé et celle attendue
-    // pour le calcule de l'intercept de la
-    // courbes des prédictions N-1 et N
 
 
     // <brouilon>
@@ -56,79 +52,71 @@ fn main() {
 
 
     let mut slope: f64 = 0.0;
-    // valeur de départ du coéficient directeur de la courbe 
+    // valeur de départ du coéficient directeur de la courbe
     // des prédictions
     let mut intercept: f64 = 0.0;
-    // valeur de départ de l'intercept de la courbe 
+    // valeur de départ de l'intercept de la courbe
     // des prédictions
     let mut predicted_height: f64;
     // la ou sera stocké la taille prédite
     // par rapport à slope et intercept
-
-    let step_size_stop: f64 = 0.001;
-    let mut slop_finale_trouve: bool = false;
-    let mut intercept_finale_trouve: bool = false;
-    // indication si les valeurs attendue ont 
-    // était trouvées
 
     for _i in 0..= try_number - 1 {
     // pour le nombre d'essayes indiqué
 
         if slop_finale_trouve == false {
             // met le "compteur" de la somme a zero
-            sum_derivative_square_residual_slope = 0.0;  
+            sum_derivative_square_residual = 0.0;
 
             // calcule d ssr par rapport au coéficient directeur de la courbe des prédictions        
             for j in 0..= WEIGHT.len() - 1 {
                 predicted_height = intercept + (slope * WEIGHT[j]);
-                derivative_square_residual_slope = (-2.0 * WEIGHT[j]) * (OBSERVED_HEIGHT[j] - predicted_height);
+                derivative_square_residual = (-2.0 * WEIGHT[j]) * (OBSERVED_HEIGHT[j] - predicted_height);
 
-                sum_derivative_square_residual_slope = derivative_square_residual_slope + sum_derivative_square_residual_slope;
+                sum_derivative_square_residual = derivative_square_residual + sum_derivative_square_residual;
             }
 
             // calcule step size, le pas
-            step_size = sum_derivative_square_residual_slope * learning_rate_slope;
-            println!("step size slope : {:?}", step_size);
+            step_size = sum_derivative_square_residual * learning_rate_slope;
+            //println!("\nstep size slope : {:?}", step_size);
 
             // determination de la prochaine valeur du coéficient directeur
             slope = slope - step_size;
-            println!("Avec le coéficient directeur de la droite de prediction {:?} la dérivée de la somme des square residual est {:?}", slope, sum_derivative_square_residual_slope);
+            //println!("Avec le coéficient directeur de la droite de prediction {:?} la dérivée de la somme des square residual est {:?}", slope, sum_derivative_square_residual_slope);
 
-            //previous_sum_derivative_square_residual_slope = sum_derivative_square_residual_slope;
-
-            if step_size <= step_size_stop && step_size >= -step_size_stop {
-                println!("fini de trouver le bon coéficient directeur de la droite de prediction  ! ");
+            if sum_derivative_square_residual <= precision_success && sum_derivative_square_residual >= -precision_success {
+            //if step_size <= step_size_stop && step_size >= -step_size_stop {
+                println!("\n\nfini de trouver le bon coéficient directeur de la droite de prediction  ! ");
                 slop_finale_trouve = true;
-                println!("résultat : {:?}", slope);
+                println!("Le coéficient directeur : {:?}", slope);
             }
         }
 
         if intercept_finale_trouve == false {
             // met le "compteur" de la somme a zero
-            sum_derivative_square_residual_intercept = 0.0;
+            sum_derivative_square_residual = 0.0;
 
             // calcule d ssr par rapport a intercept de la courbe des prédictions
-            for j in 0..= WEIGHT.len() - 1 { 
+            for j in 0..= WEIGHT.len() - 1 {
                 predicted_height = intercept + (slope * WEIGHT[j]);
-                derivative_square_residual_intercept = -2.0 * (OBSERVED_HEIGHT[j] - predicted_height);
+                derivative_square_residual = -2.0 * (OBSERVED_HEIGHT[j] - predicted_height);
 
-                sum_derivative_square_residual_intercept = derivative_square_residual_intercept + sum_derivative_square_residual_intercept;
+                sum_derivative_square_residual = derivative_square_residual + sum_derivative_square_residual;
             }
 
             // calcule step size, le pas
-            step_size = sum_derivative_square_residual_intercept * learning_rate_intercept;
-            println!("step size intercept : {:?}", step_size);
+            step_size = sum_derivative_square_residual * learning_rate_intercept;
+            //println!("\nstep size intercept : {:?}", step_size);
 
             // determination du prochain intercept
             intercept = intercept - step_size;
-            println!("Avec l'intercept {:?} la dérivée de la somme des square residual est {:?}", intercept, sum_derivative_square_residual_intercept);
+            //println!("Avec l'intercept {:?} la dérivée de la somme des square residual est {:?}", intercept, sum_derivative_square_residual_intercept);
         
-            //previous_sum_derivative_square_residual_slope = sum_derivative_square_residual_slope;
-
-            if step_size <= step_size_stop && step_size >= -step_size_stop {
-                println!("fini de trouver le bon intercept de la droite de prediction  ! ");
+            if sum_derivative_square_residual <= precision_success && sum_derivative_square_residual >= -precision_success {
+            //if step_size <= step_size_stop && step_size >= -step_size_stop {
+                println!("\n\nfini de trouver le bon intercept de la droite de prediction  ! ");
                 intercept_finale_trouve = true;
-                println!("résultat : {:?}", intercept);
+                println!("L'intercept : {:?}", intercept);
             }
         }
     }
