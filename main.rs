@@ -2,12 +2,6 @@ mod runst;
 //from : https://www.youtube.com/watch?v=GKZoOHXGcLo&t=614s
 
 fn main() {
-    ////////////////////////////// Data set ///////////////////////
-    const DOSAGE: [f64; 3] = [0.0, 0.5, 1.0]; // ce qui est donné au réseau
-    const OBSERVED_EFFECT: [f64; 3] = [0.0, 1.0, 0.0]; // ce qui est attendu qu'il donne
-
-
-
     ///////////////////// Network initialisation //////////////////////////
     // The structure of the network
     println!("Initialisation du réseaux de neurones :");
@@ -45,15 +39,15 @@ fn main() {
     //let mut weights_bias_tensor: [[Vec<f64>; 2]; 2] = [weights_tensor, bias_matrix];
 
     // details of the structure of the network
-    let mut vec_input: Vec<f64> = vec![0.0; LAYER[0]];
+    //let mut vec_input: Vec<f64> = vec![0.0; LAYER[0]];
 
-    let mut sum_l1: Vec<f64> = vec![0.0; LAYER[1]];
-    let mut sum_l1_bias: Vec<f64> = vec![0.0; LAYER[1]];
-    let mut vec_l1: Vec<f64> = vec![0.0; LAYER[1]];
+    //let mut sum_l1: Vec<f64> = vec![0.0; LAYER[1]];
+    //let mut sum_l1_bias: Vec<f64> = vec![0.0; LAYER[1]];
+    //let mut vec_l1: Vec<f64> = vec![0.0; LAYER[1]];
 
-    let mut sum_l2: Vec<f64> = vec![0.0; LAYER[2]];
-    let mut sum_l2_bias: Vec<f64> = vec![0.0; LAYER[2]];
-    let mut vec_l2: Vec<f64> = vec![0.0; LAYER[2]];
+    //let mut sum_l2: Vec<f64> = vec![0.0; LAYER[2]];
+    //let mut sum_l2_bias: Vec<f64> = vec![0.0; LAYER[2]];
+    //let mut vec_l2: Vec<f64> = vec![0.0; LAYER[2]];
 
     // the variables where will be stored the outputs of the network (the desired effects) :
     // I will have to register :
@@ -62,13 +56,34 @@ fn main() {
     //    - the vec_lx 
     
 
-    let mut network_output: Vec<f64> = vec![0.0; DOSAGE.len()]; // ce que le réseau donne
-
-
-
     println!("Les poids et les biais avant la propagations :");
     println!("Les poids : {:?}\n", weights_tensor);
     println!("Les biais : {:?}\n", bias_matrix);
+
+
+
+    ////////////////////////////// Data set ///////////////////////
+    const DOSAGE: [f64; 3] = [0.0, 0.5, 1.0]; // ce qui est donné au réseau
+    const OBSERVED_EFFECT: [f64; 3] = [0.0, 1.0, 0.0]; // ce qui est attendu qu'il donne
+    //let mut network_output: Vec<Vec<f64>> = vec![vec![[0.0; ]; 3]; 3];
+    //let mut network_output: Vec<Vec<f64>> = [[0; (LAYER.len() * 2) - 1]; DOSAGE.len()]    
+    //                                    LAYER.len() because store data by layers
+    //                                            * 2 because for eache LAYER = sum + bias, value after activ_fun
+    //                                            - 1 because input LAYER only have one value to give, the input
+    //                          The weights are already stored in weights_tensor
+    //                          Same thing for the biais (if I have to use them for the derivative)
+
+    //                          DOSAGE.len() qui est le nombre de propagation
+
+    //and for one vector only :
+    //let mut network_output: Vec<Vec<f64>> = [0; ((LAYER.len() * 2) - 1) * DOSAGE.len()]
+
+    // if I am right :
+    //      - network_output.len() / DOSAGE.len() = will give the iterator for each pairs in the data set (each propagation)
+    //      - the inputs for each propagations will be network_output[pair data set * DOSAGE.len()]
+    //      - for each layer the iteratore would be 
+
+    let mut network_output: Vec<Vec<f64>> = Vec::new();
 
     ////////////////////// PROPAGATION ////////////////////////////////////
     for i in 0..= DOSAGE.len() - 1 {
@@ -76,44 +91,94 @@ fn main() {
 
         // Input layer:
         println!("La couches des entrées, la numéros 0 a pour valeurs :");
-        vec_input[0] = DOSAGE[i];
-        println!("{:?}\n", vec_input);
+        let mut vec_input: Vec<f64> = vec![DOSAGE[i]; LAYER[0]];
 
+        println!("{:?}\n", &vec_input);
         println!("Dans les neurones de la couche 0(input) à 1 :");
-        sum_l1 = runst::multiply(&weights_tensor[0], &vec_input);
+        let mut vec_l1_sum: Vec<f64> = runst::multiply(&weights_tensor[0], &vec_input);
         println!("Après La multiplication :");
-        println!("{:?}\n", sum_l1);
-        sum_l1_bias = runst::bias_addition(&sum_l1, &bias_matrix[0]);
+        println!("{:?}\n", &vec_l1_sum);
+        let mut vec_l1_sum_bias: Vec<f64> = runst::bias_addition(&vec_l1_sum, &bias_matrix[0]);
         println!("Après l'ajout des biais :");
-        println!("{:?}\n", sum_l1_bias);
-        vec_l1 = runst::activ_fun::relu(&sum_l1_bias);
+        println!("{:?}\n", &vec_l1_sum_bias);
+        let mut vec_l1_activ_fun: Vec<f64> = runst::activ_fun::relu(&vec_l1_sum_bias);
         println!("Après le passage dans la function d'activation :");
-        println!("{:?}\n", vec_l1);
+        println!("{:?}\n", &vec_l1_activ_fun);
 
         println!("Dans les neurones de la couche 1 à 2 :");
-        sum_l2 = runst::multiply(&weights_tensor[1], &vec_l1);
+        let mut vec_l2_sum: Vec<f64> = runst::multiply(&weights_tensor[1], &vec_l1_activ_fun);
         println!("Après La multiplication :");
-        println!("{:?}\n", sum_l2);
-        sum_l2_bias = runst::bias_addition(&sum_l2, &bias_matrix[1]);
+        println!("{:?}\n", &vec_l2_sum);
+        let mut vec_l2_sum_bias: Vec<f64> = runst::bias_addition(&vec_l2_sum, &bias_matrix[1]);
         println!("Après l'ajout des biais :");
-        println!("{:?}\n", sum_l2_bias);
-        vec_l2 = runst::activ_fun::sigmoid(&sum_l2_bias);
+        println!("{:?}\n", &vec_l2_sum_bias);
+        let mut vec_l2_activ_fun: Vec<f64> = runst::activ_fun::sigmoid(&vec_l2_sum_bias);
         println!("Après le passage dans la function d'activation :");
-        println!("{:?}\n", vec_l2);
+        println!("{:?}\n", &vec_l2_activ_fun);
 
-        println!("\n\nCe que le réseaux me donne :");
-        println!("{:?}\n", vec_l2);
 
-        println!("Enregistrement de l'output :");
-        //observed_effect[i] = sum_l1_bias[0];
-        network_output[i] = vec_l2[0];
+        //enregistrement des données:
+        network_output.push(vec_input);
+
+        network_output.push(vec_l1_sum);
+        network_output.push(vec_l1_sum_bias);
+        network_output.push(vec_l1_activ_fun);
+
+        network_output.push(vec_l2_sum);
+        network_output.push(vec_l2_sum_bias);
+        network_output.push(vec_l2_activ_fun);
     }
 
-    println!("Les poids et les biais après la propagations :");
-    println!("Les poids : {:?}\n", weights_tensor);
-    println!("Les biais : {:?}\n", bias_matrix);
+    println!("\n\nCe que le réseaux me donne :");
+    println!("{:?}", network_output);
 
- 
+    
+    for i in 0..= DOSAGE.len() - 1 {
+        println!("\n\nCe que la propagation numéro {:?} a donnée :", i + 1);
+
+        // Input layer:
+        println!("La couches des entrées, la numéros 0 a pour valeurs :");
+        println!("{:?}\n", network_output[i * ((LAYER.len() * 2) + DOSAGE.len())]);
+
+        println!("Dans les neurones de la couche 0(input) à 1 :");
+        println!("Après La multiplication :");
+        println!("{:?}\n", network_output[(i * ((LAYER.len() * 2) + DOSAGE.len())) + 1]);
+        println!("Après l'ajout des biais :");
+        println!("{:?}\n", network_output[(i * ((LAYER.len() * 2)) + DOSAGE.len()) + 2]);
+        println!("Après le passage dans la function d'activation :");
+        println!("{:?}\n", network_output[(i * ((LAYER.len() * 2) + DOSAGE.len())) + 3]);
+
+        println!("Dans les neurones de la couche 1 à 2 :");
+        println!("Après La multiplication :");
+        println!("{:?}\n", network_output[(i * ((LAYER.len() * 2) + DOSAGE.len())) + 4]);
+        println!("Après l'ajout des biais :");
+        println!("{:?}\n", network_output[(i * ((LAYER.len() * 2) + DOSAGE.len())) + 5]);
+        println!("Après le passage dans la function d'activation :");
+        println!("{:?}\n", network_output[(i * ((LAYER.len() * 2) + DOSAGE.len())) + 6]);
+    }
+
+    /*
+    fn addsub(x: isize, y: isize) -> (isize, isize) {
+        let a = x + y;
+        let b = x - y;
+        
+        return (a, b)
+    }
+    
+    fn main() {
+        let test1 = addsub(2, 5).0;
+        let test2 = addsub(2, 5).1;
+    
+        println!("add : {}", test1);
+        println!("sub : {}", test2);
+    }
+    */
+
+    //println!("Les poids et les biais après la propagations :");
+    //println!("Les poids : {:?}\n", weights_tensor);
+    //println!("Les biais : {:?}\n", bias_matrix);
+
+    /* 
         /////////////////////// BACKPROPAGATION //////////////////////////
 
         /* 
@@ -179,10 +244,14 @@ fn main() {
         
                         // calcule d ssr
                     for y in 0..= network_output.len() - 1 {
-                        //network_output[j] = (&vec_l1[0] * &weights_tensor[1][0]) + (&vec_l1[1] * &weights_tensor[1][1]) + &bias_matrix[1][0];
+                        predicted_effect = (&vec_l1[0] * &weights_tensor[1][0]) + (&vec_l1[1] * &weights_tensor[1][1]) + &bias_matrix[1][0];
+                        // comme dans le code qui permet de calculer la descent de gradient :
+                        //      predicted_height = slope_intercept[1] + (slope_intercept[0] * WEIGHT[j]);
+                        // dans predicted_effect il y a la donnée d'entré qui est repercutée dans   
+                        // les poids et l'ensembles des données du réseau.
                         
                         if z == 1 {
-                            derivative_square_residual = (-2.0 * &vec_l1[j]) * (OBSERVED_EFFECT[y] - &network_output[y]);
+                            derivative_square_residual = (-2.0 * &vec_l1[j]) * (OBSERVED_EFFECT[y] - predicted_effect);
                             sum_derivative_square_residual = derivative_square_residual + sum_derivative_square_residual;
                         };
 
@@ -234,7 +303,7 @@ fn main() {
                         //network_output[j] = (&vec_l1[0] * &weights_tensor[1][0]) + (&vec_l1[1] * &weights_tensor[1][1]) + &bias_matrix[1][0];
 
                         if z == 1 {
-                            derivative_square_residual = -2.0 * (OBSERVED_EFFECT[y] - &network_output[y]);
+                            derivative_square_residual = -2.0 * (OBSERVED_EFFECT[y] - predicted_effect);
                             sum_derivative_square_residual = derivative_square_residual + sum_derivative_square_residual;
                         };
 
@@ -274,5 +343,5 @@ fn main() {
 
     println!("Les poids et les biais après la retropropagations :");
     println!("Les poids : {:?}\n", weights_tensor);
-    println!("Les biais : {:?}\n", bias_matrix);
+    println!("Les biais : {:?}\n", bias_matrix);*/
 }
