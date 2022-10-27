@@ -24,11 +24,11 @@ fn main() {
     let mut weights_tensor: [Vec<f64>; 2] = [matrix_weight_l0, matrix_weight_l1];
 
     // The bias:
-    let mut bias_l1: Vec<f64> = vec![0.0; LAYER[1]];
+    let mut bias_l1: Vec<f64> = vec![1.0; LAYER[1]];
     println!("Les biais de la couche 1 sont :");
     println!("{:?}\n", bias_l1);
 
-    let mut bias_l2: Vec<f64> = vec![0.0; LAYER[2]];
+    let mut bias_l2: Vec<f64> = vec![2.0; LAYER[2]];
     println!("Les biais de la couche 2 sont :");
     println!("{:?}\n", bias_l2);
 
@@ -134,30 +134,56 @@ fn main() {
 
     
     for i in 0..= DOSAGE.len() - 1 {
+    // pour chaque pairs de données, propagations
         println!("\n\nCe que la propagation numéro {:?} a donnée :", i + 1);
 
         // Input layer:
         println!("La couches des entrées, la numéros 0 a pour valeurs :");
-        println!("{:?}\n", network_output[i * ((LAYER.len() * 2) + DOSAGE.len())]);
+        println!("{:?}\n", network_output[i * ((LAYER.len() * 3) - 2)]);
 
         println!("Dans les neurones de la couche 0(input) à 1 :");
         println!("Après La multiplication :");
-        println!("{:?}\n", network_output[(i * ((LAYER.len() * 2) + DOSAGE.len())) + 1]);
+        println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + 1]);
         println!("Après l'ajout des biais :");
-        println!("{:?}\n", network_output[(i * ((LAYER.len() * 2)) + DOSAGE.len()) + 2]);
+        println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + 2]);
         println!("Après le passage dans la function d'activation :");
-        println!("{:?}\n", network_output[(i * ((LAYER.len() * 2) + DOSAGE.len())) + 3]);
+        println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + 3]);
 
         println!("Dans les neurones de la couche 1 à 2 :");
         println!("Après La multiplication :");
-        println!("{:?}\n", network_output[(i * ((LAYER.len() * 2) + DOSAGE.len())) + 4]);
+        println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + 4]);
         println!("Après l'ajout des biais :");
-        println!("{:?}\n", network_output[(i * ((LAYER.len() * 2) + DOSAGE.len())) + 5]);
+        println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + 5]);
         println!("Après le passage dans la function d'activation :");
-        println!("{:?}\n", network_output[(i * ((LAYER.len() * 2) + DOSAGE.len())) + 6]);
+        println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + 6]);
+
+        for j in 0..= ((LAYER.len() * 3) - 2) - 1 {
+            // pour un nombre qui est :
+            //   LAYER.len() = le nombre de couches dans le réseau
+            //   LAYER.len() * 3 = multiplier par le nb de données enregistrées 
+            //   (LAYER.len() * 3) - 2 = moins les deux données n'existants pas
+            //                           à la couche input
+            println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + j]);
+        }
+
+        
+        for j in 0..= ((LAYER.len() * 3) - 2) - 1 {
+            // pour un nombre qui représente le nombre de vecteurs enregistrés dans une propagation:
+            //   LAYER.len() = le nombre de couches dans le réseau
+            //   LAYER.len() * 3 = multiplier par le nb de données enregistrées par couche
+            //   (LAYER.len() * 3) - 2 = moins les deux données n'existants pas
+            //                           à la couche input
+
+            for y in 0..= network_output[((i * ((LAYER.len() * 3) - 2)) + j)].len() - 1 {
+                // pour chaque éléments d'un vecteur enregistré
+                println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + j][y]);
+            }
+        }
     }
 
-    /*
+
+    /* 
+    <brouillon pour l'output de la rétropropagation, les nouveaux poids et biais>
     fn addsub(x: isize, y: isize) -> (isize, isize) {
         let a = x + y;
         let b = x - y;
@@ -172,6 +198,7 @@ fn main() {
         println!("add : {}", test1);
         println!("sub : {}", test2);
     }
+    </brouillon pour l'output de la rétropropagation, les nouveaux poids et biais>
     */
 
     //println!("Les poids et les biais après la propagations :");
