@@ -76,7 +76,7 @@ fn main() {
     //                          DOSAGE.len() qui est le nombre de propagation
 
     //and for one vector only :
-    //let mut network_output: Vec<Vec<f64>> = [0; ((LAYER.len() * 2) - 1) * DOSAGE.len()]
+    //let mut network_output: Vec<Vec<f64>> = [0; iteration_network_outputs * DOSAGE.len()]
 
     // if I am right :
     //      - network_output.len() / DOSAGE.len() = will give the iterator for each pairs in the data set (each propagation)
@@ -120,11 +120,11 @@ fn main() {
         //enregistrement des données:
         network_output.push(vec_input);
 
-        network_output.push(vec_l1_sum);
+        //network_output.push(vec_l1_sum);
         network_output.push(vec_l1_sum_bias);
         network_output.push(vec_l1_activ_fun);
 
-        network_output.push(vec_l2_sum);
+        //network_output.push(vec_l2_sum);
         network_output.push(vec_l2_sum_bias);
         network_output.push(vec_l2_activ_fun);
     }
@@ -132,51 +132,56 @@ fn main() {
     println!("\n\nCe que le réseaux me donne :");
     println!("{:?}", network_output);
 
+    let iteration_reverse: usize = network_output.len() - 1;
+    let iteration_network_outputs: usize = (LAYER.len() * 2) - 1;
+    // pour un nombre qui est :
+    //   LAYER.len() = le nombre de couches dans le réseau
+    //   LAYER.len() *  2 = multiplier par le nb de données enregistrées sum_bias et activ_fun
+    //   (LAYER.len() * 2) - 1 = moins la donnée n'existants pas
+    //                           à la couche input
     
-    for i in 0..= DOSAGE.len() - 1 {
+    
+    //vérification des outputs du réseau :
+    for i in 0..= OBSERVED_EFFECT.len() - 1 {
     // pour chaque pairs de données, propagations
-        println!("\n\nCe que la propagation numéro {:?} a donnée :", i + 1);
-
-        // Input layer:
-        println!("La couches des entrées, la numéros 0 a pour valeurs :");
-        println!("{:?}\n", network_output[i * ((LAYER.len() * 3) - 2)]);
-
-        println!("Dans les neurones de la couche 0(input) à 1 :");
-        println!("Après La multiplication :");
-        println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + 1]);
-        println!("Après l'ajout des biais :");
-        println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + 2]);
-        println!("Après le passage dans la function d'activation :");
-        println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + 3]);
+        println!("\n\nCe que la propagation numéro {:?} a donnée (montré de façon à l'enver) :", (OBSERVED_EFFECT.len() - i));
+        let iteration_backprop_1: usize = iteration_reverse - (i * iteration_network_outputs);
+        //println!("back_prop_1 est : {:?}\n", iteration_backprop_1);
 
         println!("Dans les neurones de la couche 1 à 2 :");
-        println!("Après La multiplication :");
-        println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + 4]);
-        println!("Après l'ajout des biais :");
-        println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + 5]);
         println!("Après le passage dans la function d'activation :");
-        println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + 6]);
+        println!("{:?}\n", network_output[iteration_backprop_1]);
+        println!("Après l'ajout des biais :");
+        println!("{:?}\n", network_output[iteration_backprop_1 - 1]);
+        println!("Après La multiplication :");
+        println!("Pas bessoin dans la rêgle de la chaîne");
 
-        for j in 0..= ((LAYER.len() * 3) - 2) - 1 {
-            // pour un nombre qui est :
-            //   LAYER.len() = le nombre de couches dans le réseau
-            //   LAYER.len() * 3 = multiplier par le nb de données enregistrées 
-            //   (LAYER.len() * 3) - 2 = moins les deux données n'existants pas
-            //                           à la couche input
-            println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + j]);
+        println!("Dans les neurones de la couche 0(input) à 1 :");
+        println!("Après le passage dans la function d'activation :");
+        println!("{:?}\n", network_output[iteration_backprop_1 - 2]);
+        println!("Après l'ajout des biais :");
+        println!("{:?}\n", network_output[iteration_backprop_1 - 3]); 
+        println!("Après La multiplication :");
+        println!("Pas bessoin dans la rêgle de la chaîne");
+
+        println!("La couches des entrées, la numéros 0 a pour valeurs :");
+        println!("{:?}\n", network_output[iteration_backprop_1 - 4]);
+
+        for j in 0..= iteration_network_outputs - 1 {
+            let iteration_backprop_2: usize = iteration_reverse - ((i * iteration_network_outputs) + j);
+            //println!("back_prop_2 est : {:?}\n", iteration_backprop_2);
+
+            println!("{:?}\n", network_output[iteration_backprop_2]);
         }
 
-        
-        for j in 0..= ((LAYER.len() * 3) - 2) - 1 {
-            // pour un nombre qui représente le nombre de vecteurs enregistrés dans une propagation:
-            //   LAYER.len() = le nombre de couches dans le réseau
-            //   LAYER.len() * 3 = multiplier par le nb de données enregistrées par couche
-            //   (LAYER.len() * 3) - 2 = moins les deux données n'existants pas
-            //                           à la couche input
 
-            for y in 0..= network_output[((i * ((LAYER.len() * 3) - 2)) + j)].len() - 1 {
+        for j in 0..= iteration_network_outputs - 1 {
+            let iteration_backprop_3: usize = iteration_reverse - ((i * iteration_network_outputs) + j);
+            //println!("back_prop_3 est : {:?}\n", iteration_backprop_3);
+
+            for y in 0..= network_output[iteration_backprop_3].len() - 1 {
                 // pour chaque éléments d'un vecteur enregistré
-                println!("{:?}\n", network_output[(i * ((LAYER.len() * 3) - 2)) + j][y]);
+                println!("{:?}\n", network_output[iteration_backprop_3][y]);
             }
         }
     }
@@ -205,7 +210,7 @@ fn main() {
     //println!("Les poids : {:?}\n", weights_tensor);
     //println!("Les biais : {:?}\n", bias_matrix);
 
-    /* 
+     
         /////////////////////// BACKPROPAGATION //////////////////////////
 
         /* 
@@ -214,7 +219,7 @@ fn main() {
 
         const network_output: [f64; 3] = [0.0, 1.0, 0.0]; // ce qui est attendu qu'il donne
         */
-
+    /*
     let try_number: usize = 1000;
 
     let mut weights_l0_find: Vec<bool> = vec![false; weights_tensor[0].len()];
@@ -238,7 +243,7 @@ fn main() {
         // taille des pas dans le rapprochement de 
         // sum_derivative_square_residual
 
-    let learning_rate_weights: f64 = 0.1;
+    let learning_rate_weights: f64 = 0.01;
     let learning_rate_bias: f64 = 0.1;
 
     let mut sum_derivative_square_residual: f64;
@@ -259,18 +264,32 @@ fn main() {
         // </brouilon>
 
     for _i in 0..= try_number - 1 {
-        // pour le nombre d'essayes indiqué
+        // pour le nombre d'essayes indiqué, vas de 0 à 999
 
-        // for each layers of weight
+        // for each layers of weight va de 0 à 1 car il y a deux couche de poids 
         for z in 0..= weights_tensor.len() - 1 {
             // for eache weights of the layer z
-            for j in 0..= weights_tensor[z].len() - 1 {
+            for j in 0..= weights_tensor[z].len() - 1 { // va du layer 1 au layer 2
                 if weights_find[z][j] == false {
                         // met le "compteur" de la somme a zero
                     sum_derivative_square_residual = 0.0;
         
                         // calcule d ssr
-                    for y in 0..= network_output.len() - 1 {
+                    for y in 0..= OBSERVED_EFFECT.len() - 1 { // fait 3 itération
+                        // pour chaque pairs de données, chaque propagations
+
+                        /* exemple d'itération à l'envers
+                        fn main() {
+                        let vec_of_foo: Vec<usize> = vec![1, 2, 3];
+                        
+                            for i in 0..= vec_of_foo.len() - 1 {
+                                println!("{:?}", vec_of_foo[(vec_of_foo.len() - 1 /* 2 */) - i])
+                                // first = 2 - 0 = 2
+                                // second = 2 - 1 = 1
+                                // third = 2 - 2 = 0
+                            }
+                        } */
+
                         predicted_effect = (&vec_l1[0] * &weights_tensor[1][0]) + (&vec_l1[1] * &weights_tensor[1][1]) + &bias_matrix[1][0];
                         // comme dans le code qui permet de calculer la descent de gradient :
                         //      predicted_height = slope_intercept[1] + (slope_intercept[0] * WEIGHT[j]);
@@ -326,7 +345,8 @@ fn main() {
                     sum_derivative_square_residual = 0.0;
         
                     // calcule d ssr
-                    for y in 0..= network_output.len() - 1 {
+                    for y in 0..= OBSERVED_EFFECT.len() - 1 {
+                    // pour chaque pairs de données, chaque propagations
                         //network_output[j] = (&vec_l1[0] * &weights_tensor[1][0]) + (&vec_l1[1] * &weights_tensor[1][1]) + &bias_matrix[1][0];
 
                         if z == 1 {
@@ -370,5 +390,5 @@ fn main() {
 
     println!("Les poids et les biais après la retropropagations :");
     println!("Les poids : {:?}\n", weights_tensor);
-    println!("Les biais : {:?}\n", bias_matrix);*/
+    println!("Les biais : {:?}\n", bias_matrix); */
 }
