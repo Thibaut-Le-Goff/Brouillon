@@ -35,26 +35,28 @@ fn main() {
     // Creation of the matrix of bias :
     let mut bias_matrix: [Vec<f64>; 2] = [bias_l1, bias_l2];
     
+    /* 
     println!("Les poids et les biais avant la propagations :");
     println!("Les poids : {:?}\n", weights_tensor);
     println!("Les biais : {:?}\n", bias_matrix);
-
+    */
 
     ////////////////////////////// Data set ///////////////////////
     const DOSAGE: [f64; 3] = [0.0, 0.5, 1.0]; // ce qui est donné au réseau
     const OBSERVED_EFFECT: [f64; 3] = [0.0, 1.0, 0.0]; // ce qui est attendu qu'il donne
 
-    let mut network_output: Vec<Vec<f64>> = Vec::new();
-
+    let mut network_outputs_sum_bias: Vec<Vec<f64>> = Vec::new();
+    let mut network_outputs_neurons: Vec<Vec<f64>> = Vec::new();
+    
     ////////////////////// PROPAGATION ////////////////////////////////////
     for i in 0..= DOSAGE.len() - 1 {
-        println!("Propagation des données d'entrée :");
+        println!("Propagation numéro {} des données d'entrée :", i);
 
         // Input layer:
         println!("La couches des entrées, la numéros 0 a pour valeurs :");
         let vec_input: Vec<f64> = vec![DOSAGE[i]; LAYER[0]];
-
         println!("{:?}\n", &vec_input);
+
         println!("Dans les neurones de la couche 0(input) à 1 :");
         let vec_l0_sum: Vec<f64> = runst::multiply(&weights_tensor[0], &vec_input);
         println!("Après La multiplication :");
@@ -62,7 +64,7 @@ fn main() {
         let vec_l0_sum_bias: Vec<f64> = runst::bias_addition(&vec_l0_sum, &bias_matrix[0]);
         println!("Après l'ajout des biais :");
         println!("{:?}\n", &vec_l0_sum_bias);
-        let vec_l0_activ_fun: Vec<f64> = runst::activ_fun::relu(&vec_l0_sum_bias);
+        let vec_l0_activ_fun: Vec<f64> = runst::activ_fun::soft_plus(&vec_l0_sum_bias);
         println!("Après le passage dans la function d'activation :");
         println!("{:?}\n", &vec_l0_activ_fun);
 
@@ -73,25 +75,75 @@ fn main() {
         let vec_l1_sum_bias: Vec<f64> = runst::bias_addition(&vec_l1_sum, &bias_matrix[1]);
         println!("Après l'ajout des biais :");
         println!("{:?}\n", &vec_l1_sum_bias);
-        let vec_l1_activ_fun: Vec<f64> = runst::activ_fun::none(&vec_l1_sum_bias);
+        let vec_l1_activ_fun: Vec<f64> = runst::activ_fun::soft_plus(&vec_l1_sum_bias);
         println!("Après le passage dans la function d'activation :");
         println!("{:?}\n", &vec_l1_activ_fun);
 
 
         //enregistrement des données:
-        network_output.push(vec_input);
+        //network_outputs_input_neurons.push(vec_input);
 
         //network_output.push(vec_l0_sum);
-        network_output.push(vec_l0_sum_bias);
-        network_output.push(vec_l0_activ_fun);
+        network_outputs_sum_bias.push(vec_l0_sum_bias);
+        network_outputs_neurons.push(vec_l0_activ_fun);
 
         //network_output.push(vec_l1_sum);
-        network_output.push(vec_l1_sum_bias);
-        network_output.push(vec_l1_activ_fun);
+        network_outputs_sum_bias.push(vec_l1_sum_bias);
+        network_outputs_neurons.push(vec_l1_activ_fun);
+    }
+    let reverse_network_outputs_sum_bias: usize = network_outputs_sum_bias.len() - 1;
+    let reverse_network_outputs_neurons: usize = network_outputs_neurons.len() - 1;
+
+    let iteration_network_length: usize = LAYER.len() - 1;
+    // pour un nombre qui est :
+    //   LAYER.len() = le nombre de couches dans le réseau
+    //   LAYER.len() *  1 = multiplier par le nb de données enregistrées 
+    //                      sum_bias et activ_fun pour un autre vecteur
+    //   LAYER.len() - 1 = moins la donnée n'existants pas
+    //                     à la couche input
+
+    println!("\n\nCe que le réseaux me donne à l'enver :");
+    for i in 0..= DOSAGE.len() - 1 {
+        // pour chaque propagation
+        println!("\n\nÀ la propagation numéro {} :", (DOSAGE.len() - 1) - i);
+
+        println!("Dans les neurones de la couche 1 à 2 :");
+        println!("Après le passage dans la function d'activation :");
+        println!("{:?}\n", network_outputs_neurons[reverse_network_outputs_neurons - (i * iteration_network_length)]);
+        println!("Après l'ajout des biais :");
+        println!("{:?}\n", network_outputs_sum_bias[reverse_network_outputs_sum_bias - (i * iteration_network_length)]);
+
+        println!("Dans les neurones de la couche 0(input) à 1 :");
+        println!("Après le passage dans la function d'activation :");
+        println!("{:?}\n", network_outputs_neurons[reverse_network_outputs_neurons - ((i * iteration_network_length) + 1)]);
+        println!("Après l'ajout des biais :");
+        println!("{:?}\n", network_outputs_sum_bias[reverse_network_outputs_sum_bias - ((i * iteration_network_length) + 1)]);
+
+        println!("La couches des entrées, la numéros 0 a pour valeurs :");
+        println!("{:?}\n", DOSAGE[(DOSAGE.len() - 1) - i]);
+
+        for j in 0..= iteration_network_length - 1 {
+            // pour chaque couches, LAYER.len() - 1
+            println!("Les neurons_outputs :");
+            for k in 0..= network_outputs_neurons[reverse_network_outputs_neurons - ((i * iteration_network_length) + j)].len() - 1 {
+                // pour chaque neurons_outputs de la couche j de l'itération i
+                println!("{:?}\n", network_outputs_neurons[reverse_network_outputs_neurons - ((i * iteration_network_length) + j)][k]);
+            }
+            println!("Les sum_bias :");
+            for k in 0..= network_outputs_sum_bias[reverse_network_outputs_sum_bias - ((i * iteration_network_length) + j)].len() - 1 {
+                // pour chaque sum_bias de la couche j de l'itération i
+                println!("{:?}\n", network_outputs_sum_bias[reverse_network_outputs_sum_bias - ((i * iteration_network_length) + j)][k]);
+            }
+        }
+        println!("Les neurons_outputs :");
+        println!("{:?}\n", DOSAGE[(DOSAGE.len() - 1) - i]);
     }
 
-    println!("\n\nCe que le réseaux me donne :");
-    println!("{:?}", network_output);
+    /*
+    println!("sum + bias : {:?}", network_outputs_sum_bias);
+    println!("neurons outputs : {:?}", network_outputs_neurons);    
+    println!("input neurons outputs : {:?}", network_outputs_neurons);    
+
 
     println!("\n\nLes poids à l'endroit :");
     for i in 0..= weights_tensor.len() - 1 {
@@ -118,10 +170,10 @@ fn main() {
         println!("Les biais de la couche {} :", bias_reverse - i);
         println!("{:?}", bias_matrix[bias_reverse - i]);
     }
-
+    
 
     let iteration_reverse: usize = network_output.len() - 1;
-    let iteration_network_outputs: usize = (LAYER.len() * 2) - 1;
+    let iteration_network_length: usize = (LAYER.len() * 2) - 1;
     // pour un nombre qui est :
     //   LAYER.len() = le nombre de couches dans le réseau
     //   LAYER.len() *  2 = multiplier par le nb de données enregistrées sum_bias et activ_fun
@@ -201,5 +253,5 @@ fn main() {
                 println!("{:?}", bias_matrix[bias_reverse - j][k]);
             }
         }
-    }
+    } */
 }
