@@ -1,16 +1,16 @@
 use plotters::prelude::*;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+pub fn test(test_vec: Vec<(f32, f32)>, test_str: &str) -> Result<(), Box<dyn std::error::Error>> {
     // send the result of the function in a result containing:
     //  - the result in case of succes = ()
     //  - a box (a pointer but its keeps ownership, in short)
 
      
-    let test_vec: Vec<(f32, f32)> = vec![(1.0, 3.3), (2., 2.1), (3., 1.5), (4., 1.9), (5., 1.0)];
+    //let test_vec: Vec<(f32, f32)> = vec![(1.0, 3.3), (2., 2.1), (3., 1.5), (4., 1.9), (5., 1.0)];
    
     //let mut chart_builder = ChartBuilder::on(&drawing_area);
 
-    let root = BitMapBackend::new("plotters-doc-data.png", (1280, 960)).into_drawing_area();
+    let root = BitMapBackend::new(&test_str, (1280, 960)).into_drawing_area();
     root.fill(&WHITE);
 
     //let mut chart_context = chart_builder.build_cartesian_2d(0.0..5.5, 0.0..5.5).unwrap();
@@ -54,7 +54,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Similarly, we can draw point series
     // put the red dot
     chart.draw_series(PointSeries::of_element(
-        //vec![(0.0, 0.0), (5.0, 5.0), (8.0, 7.0), test_vec[1]],
         test_vec,
         5,
         &BLACK,
@@ -66,21 +65,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     ))?;
     root.present()?;
-    
-    /*
-    //use plotters::prelude::*;
-    let data = [(1.0, 3.3), (2., 2.1), (3., 1.5), (4., 1.9), (5., 1.0)];
-    let drawing_area = SVGBackend::new("configure_series_labels.svg", (300, 200)).into_drawing_area();
-    drawing_area.fill(&WHITE).unwrap();
-    let mut chart_builder = ChartBuilder::on(&drawing_area);
-    chart_builder.margin(7).set_left_and_bottom_label_area_size(20);
-    let mut chart_context = chart_builder.build_cartesian_2d(-5.0..5.5, -5.0..5.5).unwrap();
-    chart_context.configure_mesh().draw().unwrap();
-    chart_context.draw_series(LineSeries::new(data, BLACK)).unwrap().label("Series 1")
-        .legend(|(x,y)| Rectangle::new([(x - 15, y + 1), (x, y)], BLACK));
-    chart_context.configure_series_labels().position(SeriesLabelPosition::UpperRight).margin(20)
-        .legend_area_size(5).border_style(BLUE).background_style(BLUE.mix(0.1)).label_font(("Calibri", 20)).draw().unwrap();
-    */
-
     Ok(())
+}
+
+fn main() {
+    //let test_vec: Vec<(f32, f32)> = vec![(1.0, 3.3), (2., 2.1), (3., 1.5), (4., 1.9), (5., 1.0)];
+
+    for i in 0..= 2 {
+        //let test_vec2: = &test_vec;
+        let test_vec: Vec<(f32, f32)> = vec![(1.0, 3.3), (2., 2.1), (3., 1.5), (4., 1.9), (5., 1.0)];
+        let test_str: Box<String> = Box::new(format!("plotters-doc-data-test{}.png", i+1));
+        
+        test(test_vec, &test_str).ok();
+    }
 }
