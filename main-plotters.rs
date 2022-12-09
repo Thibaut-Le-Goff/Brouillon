@@ -13,8 +13,30 @@ pub fn test(test_vec: Vec<(f32, f32)>, test_str: &str) -> Result<(), Box<dyn std
     let root = BitMapBackend::new(&test_str, (1280, 960)).into_drawing_area();
     root.fill(&WHITE);
 
-    //let mut chart_context = chart_builder.build_cartesian_2d(0.0..5.5, 0.0..5.5).unwrap();
+    //determine the size between the chart and the end of the image
     let root = root.margin(10, 10, 10, 15);
+
+    /* 
+    let mut min_x: f32 = test_vec[0].0;
+    let mut max_x: f32 = test_vec[0].0;
+    let mut min_y: f32 = test_vec[0].1;
+    let mut max_y: f32 = test_vec[0].1;
+
+    for i in 0..= test_vec.len() - 1 {
+        if test_vec[i].0 > max_x {
+            max_x = test_vec[i].0;
+        }
+        if test_vec[i].0 < min_x {
+            min_x = test_vec[i].0;
+        }
+        if test_vec[i].1 > max_y {
+            max_y = test_vec[i].1;
+        }
+        if test_vec[i].1 < min_y {
+            min_y = test_vec[i].1;
+        }
+    }
+    */
 
     // After this point, we should be able to draw construct a chart context
     let mut chart = ChartBuilder::on(&root)
@@ -26,6 +48,16 @@ pub fn test(test_vec: Vec<(f32, f32)>, test_str: &str) -> Result<(), Box<dyn std
         .y_label_area_size(40)
         // length of values of the x and y axis
         .build_cartesian_2d(-10f32..10f32, -20f32..10f32)?;
+
+        // test
+        //.build_cartesian_2d(min_x + (max_x / 10.0)..max_x + (max_x / 10.0), min_y + (min_y / 10.0)..max_y + (max_y / 10.0))?;
+        // to be more convinient to see, I want to create some space between the datas and the end of the chart
+            //example:
+            // -10 + (-10 / 2) = -15 => bon pour min si min est negatif, recule(min) par rapport à -10
+            // -10 - (-10 / 2) = -5 => bon pour max si max est negatif, avence(max) par rapport à -10
+
+            // 10 - (10 / 2) = 5 => bon pour min si min est positif, recule(min) par rapport à 10
+            // 10 + (10 / 2) = 15 => bon pour max si max est positif, avence(max) par rapport à 10
 
     // Then we can draw a mesh
     // configuration du quadrillage
@@ -69,13 +101,78 @@ pub fn test(test_vec: Vec<(f32, f32)>, test_str: &str) -> Result<(), Box<dyn std
 }
 
 fn main() {
-    //let test_vec: Vec<(f32, f32)> = vec![(1.0, 3.3), (2., 2.1), (3., 1.5), (4., 1.9), (5., 1.0)];
+    let calc_test: f32 = 3 as f32;
+    //let test_vec: Box<Vec<(f32, f32)>> = Box::new(vec![(calc_test + 1.0, calc_test / 3.3), (2.0 * calc_test, calc_test * 2.1), (3.0 - calc_test, 1.5 + calc_test), (calc_test - 4.0, 1.9 / calc_test), (5.0 - calc_test, 1.0 / calc_test)]);
+    let test_vec: Vec<(f32, f32)> = vec![(calc_test + 1.0, calc_test / 3.3), (2.0 * calc_test, calc_test * 2.1), (3.0 - calc_test, 1.5 + calc_test), (calc_test - 4.0, 1.9 / calc_test), (5.0 - calc_test, 1.0 / calc_test)];
+
+        
+    let mut min_x: f32 = test_vec[0].0;
+    let mut max_x: f32 = test_vec[0].0;
+    let mut min_y: f32 = test_vec[0].1;
+    let mut max_y: f32 = test_vec[0].1;
+    
+    for i in 0..= test_vec.len() - 1 {
+        if test_vec[i].0 > max_x {
+            max_x = test_vec[i].0;
+        }
+        if test_vec[i].0 < min_x {
+            min_x = test_vec[i].0;
+        }
+        if test_vec[i].1 > max_y {
+            max_y = test_vec[i].1;
+        }
+        if test_vec[i].1 < min_y {
+            min_y = test_vec[i].1;
+        }
+    }
 
     for i in 0..= 2 {
         //let test_vec2: = &test_vec;
-        let test_vec: Vec<(f32, f32)> = vec![(1.0, 3.3), (2., 2.1), (3., 1.5), (4., 1.9), (5., 1.0)];
-        let test_str: Box<String> = Box::new(format!("plotters-doc-data-test{}.png", i+1));
-        
-        test(test_vec, &test_str).ok();
+        // order : x, y
+       
+        /* 
+    
+        */  
+       
+        //let slope: f32 = 2;
+        //let intercept: f32 = 10;
+        let test_str: Box<String> = Box::new(format!("plotters-doc-data-test-{}.png", i+1));
+
+        test((test_vec).to_vec(), &test_str).ok();
+        //test(test_vec, &test_str).ok();
     }
+
 }
+
+////// Test concluant ////////
+/*
+fn main() {
+    let test_vec: Vec<(f32, f32)> = vec![(1.0, -3.3), (2., 2.1), (-3., 1.5), (4., 1.9), (5., 1.0)];
+
+    println!("{:?}", test_vec[1]);
+    println!("{:?}", test_vec[1].0);
+    
+    let mut min_x: f32 = test_vec[0].0;
+    let mut max_x: f32 = test_vec[0].0;
+    let mut min_y: f32 = test_vec[0].1;
+    let mut max_y: f32 = test_vec[0].1;
+
+    for i in test_vec {
+        if i.0 > max_x {
+            max_x = i.0;
+        }
+        if i.0 < min_x {
+            min_x = i.0;
+        }
+        if i.1 > max_y {
+            max_y = i.1;
+        }
+        if i.1 < min_y {
+            min_y = i.1;
+        }
+    }
+    
+    println!("L'axe des x va de {:?} à {:?}", min_x, max_x);
+    println!("L'axe des y va de {:?} à {:?}", min_y, max_y);
+}
+*/
